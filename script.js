@@ -1,75 +1,52 @@
-// System type definitions with point counts
+// System type definitions with ONLY hardware points
 const systemTypes = {
     ahu: {
-        verySimple: { hw: 6, sw: 5, total: 11, objects: 25, 
-            points: {ui: 4, bi: 2, bo: 3, co: 2, ao: 0} },
-        simple: { hw: 12, sw: 10, total: 22, objects: 49,
-            points: {ui: 6, bi: 3, bo: 4, co: 3, ao: 1} },
-        average: { hw: 21, sw: 15, total: 36, objects: 80,
-            points: {ui: 8, bi: 4, bo: 6, co: 4, ao: 2} },
-        complex: { hw: 30, sw: 20, total: 50, objects: 110,
-            points: {ui: 10, bi: 6, bo: 8, co: 6, ao: 3} }
+        verySimple: { hw: 6, points: {ui: 4, bi: 1, bo: 1, co: 0, ao: 0} },
+        simple: { hw: 12, points: {ui: 6, bi: 2, bo: 2, co: 1, ao: 1} },
+        average: { hw: 21, points: {ui: 8, bi: 4, bo: 5, co: 2, ao: 2} },
+        complex: { hw: 30, points: {ui: 10, bi: 6, bo: 8, co: 3, ao: 3} }
     },
     chiller: {
-        verySimple: { hw: 5, sw: 10, total: 15, objects: 33,
-            points: {ui: 3, bi: 2, bo: 2, co: 2, ao: 1} },
-        simple: { hw: 14, sw: 20, total: 34, objects: 75,
-            points: {ui: 6, bi: 3, bo: 4, co: 3, ao: 2} },
-        average: { hw: 32, sw: 30, total: 62, objects: 137,
-            points: {ui: 8, bi: 4, bo: 6, co: 4, ao: 3} },
-        complex: { hw: 48, sw: 40, total: 88, objects: 194,
-            points: {ui: 12, bi: 6, bo: 8, co: 6, ao: 4} }
+        verySimple: { hw: 5, points: {ui: 3, bi: 1, bo: 1, co: 0, ao: 0} },
+        simple: { hw: 14, points: {ui: 6, bi: 2, bo: 3, co: 2, ao: 1} },
+        average: { hw: 32, points: {ui: 12, bi: 6, bo: 8, co: 3, ao: 3} },
+        complex: { hw: 48, points: {ui: 16, bi: 10, bo: 12, co: 6, ao: 4} }
     },
     vav: {
-        simple: { hw: 2, sw: 5, total: 7, objects: 16,
-            points: {ui: 3, bi: 0, bo: 3, co: 2, ao: 0} },
-        average: { hw: 4, sw: 10, total: 14, objects: 31,
-            points: {ui: 3, bi: 0, bo: 3, co: 2, ao: 0} },
-        complex: { hw: 7, sw: 15, total: 22, objects: 49,
-            points: {ui: 3, bi: 0, bo: 3, co: 2, ao: 0} }
+        simple: { hw: 2, points: {ui: 1, bi: 0, bo: 1, co: 0, ao: 0} },
+        average: { hw: 4, points: {ui: 2, bi: 0, bo: 1, co: 1, ao: 0} },
+        complex: { hw: 7, points: {ui: 3, bi: 1, bo: 2, co: 1, ao: 0} }
     }
 };
 
-// Controller definitions
+// Controller definitions with point capacities
 const controllers = {
     cgm04060: {
-        points: 10,
-        type: 'General Purpose',
         model: 'M4-CGM04060-0',
         ui: 3, bi: 1, bo: 2, co: 4, ao: 0,
-        supportedSystems: ['ahu', 'chiller', 'boiler', 'fcu']
+        supportedSystems: ['ahu', 'chiller']
     },
     cgm09090: {
-        points: 18,
-        type: 'General Purpose',
         model: 'M4-CGM09090-0',
         ui: 7, bi: 2, bo: 3, co: 4, ao: 2,
-        supportedSystems: ['ahu', 'chiller', 'boiler', 'fcu']
+        supportedSystems: ['ahu', 'chiller']
     },
     cvm03050: {
-        points: 8,
-        type: 'VAV',
         model: 'M4-CVM03050-0',
         ui: 3, bi: 0, bo: 3, co: 2, ao: 0,
         supportedSystems: ['vav']
     },
     xpm04060: {
-        points: 10,
-        type: 'Expansion',
         model: 'M4-XPM04060-0',
         ui: 3, bi: 1, bo: 2, co: 4, ao: 0,
         requiresBase: true
     },
     xpm09090: {
-        points: 18,
-        type: 'Expansion',
         model: 'M4-XPM09090-0',
         ui: 7, bi: 2, bo: 3, co: 4, ao: 2,
         requiresBase: true
     },
     xpm18000: {
-        points: 18,
-        type: 'Expansion',
         model: 'M4-XPM18000-0',
         ui: 0, bi: 18, bo: 0, co: 0, ao: 0,
         requiresBase: true
@@ -177,7 +154,7 @@ function updateComplexityOptions(systemSelect, complexitySelect) {
     ).join('');
 }
 
-function calculatePointRequirements(systems) {
+function calculateHardwarePoints(systems) {
     let totalPoints = {
         ui: 0, bi: 0, bo: 0, co: 0, ao: 0,
         total: 0
@@ -192,7 +169,7 @@ function calculatePointRequirements(systems) {
         totalPoints.bo += points.bo * quantity;
         totalPoints.co += points.co * quantity;
         totalPoints.ao += points.ao * quantity;
-        totalPoints.total += systemTypes[system.type][system.complexity].total * quantity;
+        totalPoints.total += systemTypes[system.type][system.complexity].hw * quantity;
     });
     
     return totalPoints;
@@ -216,6 +193,7 @@ function determineControllers(points, systems) {
     // Handle other systems
     const nonVAVSystems = systems.filter(s => s.type !== 'vav');
     if (nonVAVSystems.length > 0) {
+        // Calculate points excluding VAV points
         const remainingPoints = {
             ui: points.ui,
             bi: points.bi,
@@ -223,48 +201,49 @@ function determineControllers(points, systems) {
             co: points.co,
             ao: points.ao
         };
-        
-        // Determine base controllers needed
+
+        // First try CGM09090 controllers for best point density
         const cgm09090Count = Math.ceil(Math.max(
             remainingPoints.ui / controllers.cgm09090.ui,
-            remainingPoints.bi / controllers.cgm09090.bi,
+            remainingPoints.bi / controllers.cgm09090.bi || 0,
             remainingPoints.bo / controllers.cgm09090.bo,
             remainingPoints.co / controllers.cgm09090.co,
             remainingPoints.ao / controllers.cgm09090.ao || 0
         ));
-        
+
         if (cgm09090Count > 0) {
             requiredControllers.push({
                 model: 'M4-CGM09090-0',
                 quantity: cgm09090Count,
                 type: 'General Purpose Controller'
             });
-        }
-        
-        // Check if expansion modules are needed
-        const remainingAfterCGM = {
-            ui: remainingPoints.ui - (cgm09090Count * controllers.cgm09090.ui),
-            bi: remainingPoints.bi - (cgm09090Count * controllers.cgm09090.bi),
-            bo: remainingPoints.bo - (cgm09090Count * controllers.cgm09090.bo),
-            co: remainingPoints.co - (cgm09090Count * controllers.cgm09090.co),
-            ao: remainingPoints.ao - (cgm09090Count * controllers.cgm09090.ao)
-        };
-        
-        if (Object.values(remainingAfterCGM).some(v => v > 0)) {
-            const xpmCount = Math.ceil(Math.max(
-                remainingAfterCGM.ui / controllers.xpm09090.ui,
-                remainingAfterCGM.bi / controllers.xpm09090.bi,
-                remainingAfterCGM.bo / controllers.xpm09090.bo,
-                remainingAfterCGM.co / controllers.xpm09090.co,
-                remainingAfterCGM.ao / controllers.xpm09090.ao || 0
-            ));
-            
-            if (xpmCount > 0) {
-                requiredControllers.push({
-                    model: 'M4-XPM09090-0',
-                    quantity: xpmCount,
-                    type: 'Expansion Module'
-                });
+
+            // Calculate remaining points after CGM09090s
+            const remainingAfterCGM = {
+                ui: remainingPoints.ui - (cgm09090Count * controllers.cgm09090.ui),
+                bi: remainingPoints.bi - (cgm09090Count * controllers.cgm09090.bi),
+                bo: remainingPoints.bo - (cgm09090Count * controllers.cgm09090.bo),
+                co: remainingPoints.co - (cgm09090Count * controllers.cgm09090.co),
+                ao: remainingPoints.ao - (cgm09090Count * controllers.cgm09090.ao)
+            };
+
+            // Add expansion modules if needed
+            if (Object.values(remainingAfterCGM).some(v => v > 0)) {
+                const xpmCount = Math.ceil(Math.max(
+                    remainingAfterCGM.ui / controllers.xpm09090.ui,
+                    remainingAfterCGM.bi / controllers.xpm09090.bi || 0,
+                    remainingAfterCGM.bo / controllers.xpm09090.bo,
+                    remainingAfterCGM.co / controllers.xpm09090.co,
+                    remainingAfterCGM.ao / controllers.xpm09090.ao || 0
+                ));
+
+                if (xpmCount > 0) {
+                    requiredControllers.push({
+                        model: 'M4-XPM09090-0',
+                        quantity: xpmCount,
+                        type: 'Expansion Module'
+                    });
+                }
             }
         }
     }
@@ -290,15 +269,15 @@ function calculateRecommendation() {
         });
     });
     
-    const points = calculatePointRequirements(systems);
+    const points = calculateHardwarePoints(systems);
     const { controllers: requiredControllers, warnings } = determineControllers(points, systems);
     
     const totalControllers = requiredControllers.reduce((sum, c) => sum + c.quantity, 0);
     const panelSize = determinePanelSize(totalControllers);
     const numberOfPanels = Math.ceil(totalControllers / panelSize.maxControllers);
     
-    // Determine SNE model
-    let totalDevices = requiredControllers.reduce((sum, c) => sum + c.quantity, 0);
+    // Determine SNE model based on device count
+    const totalDevices = requiredControllers.reduce((sum, c) => sum + c.quantity, 0);
     let recommendedSNE = 'SNE10500';
     if (totalDevices > 150) recommendedSNE = 'SNE22000';
     else if (totalDevices > 60) recommendedSNE = 'SNE11000';
@@ -311,11 +290,16 @@ function updateUI(points, controllers, totalDevices, sneModel, panelSize, panelC
     document.getElementById('recommendation').classList.remove('hidden');
     
     // Update points
-    document.getElementById('totalUI').textContent = points.ui;
-    document.getElementById('totalBI').textContent = points.bi;
-    document.getElementById('totalBO').textContent = points.bo;
-    document.getElementById('totalCO').textContent = points.co;
-    document.getElementById('totalAO').textContent = points.ao;
+    document.getElementById('totalPoints').textContent = `Total Hardware Points: ${points.total}`;
+    document.getElementById('pointBreakdown').innerHTML = `
+        <ul>
+            <li>Universal Inputs (UI): ${points.ui}</li>
+            <li>Binary Inputs (BI): ${points.bi}</li>
+            <li>Binary Outputs (BO): ${points.bo}</li>
+            <li>Configurable Outputs (CO): ${points.co}</li>
+            <li>Analog Outputs (AO): ${points.ao}</li>
+        </ul>
+    `;
     
     // Update controllers
     const controllerList = document.getElementById('controllerList');
