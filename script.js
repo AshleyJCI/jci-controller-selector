@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addSystem').addEventListener('click', addSystem);
 });
 
+// Helper functions
 function addSystem() {
     const systemRow = document.createElement('div');
     systemRow.className = 'system-row';
@@ -149,6 +150,7 @@ function updateComplexityOptions(systemSelect, complexitySelect) {
     ).join('');
 }
 
+// Core calculation functions
 function calculateHardwarePoints(systems) {
     let totalPoints = {
         ui: 0, bi: 0, bo: 0, co: 0, ao: 0,
@@ -252,6 +254,7 @@ function determinePanelSize(totalControllers) {
     return panelSizes.largest;
 }
 
+// Main calculation function
 function calculateRecommendation() {
     const systems = [];
     document.querySelectorAll('.system-row').forEach(row => {
@@ -269,4 +272,61 @@ function calculateRecommendation() {
     const panelSize = determinePanelSize(totalControllers);
     const numberOfPanels = Math.ceil(totalControllers / panelSize.maxControllers);
     
-    const totalDevices = requiredControllers.reduce((sum, c) => sum + c.quantity
+    const totalDevices = requiredControllers.reduce((sum, c) => sum + c.quantity, 0);
+    
+    // Determine SNE model based on device count
+    let recommendedSNE = 'SNE10500';
+    if (totalDevices > 150) recommendedSNE = 'SNE22000';
+    else if (totalDevices > 60) recommendedSNE = 'SNE11000';
+    
+    // Update UI with all calculations
+    updateUI(points, requiredControllers, totalDevices, recommendedSNE, panelSize, numberOfPanels, warnings);
+}
+
+// UI update function
+function updateUI(points, controllers, totalDevices, sneModel, panelSize, panelCount, warnings) {
+    document.getElementById('recommendation').classList.remove('hidden');
+    
+    // Update points display
+    document.getElementById('totalUI').textContent = points.ui;
+    document.getElementById('totalBI').textContent = points.bi;
+    document.getElementById('totalBO').textContent = points.bo;
+    document.getElementById('totalCO').textContent = points.co;
+    document.getElementById('totalAO').textContent = points.ao;
+    
+    // Update controller list
+    const controllerList = document.getElementById('controllerList');
+    controllerList.innerHTML = controllers.map(c => 
+        `<div>${c.quantity}x ${c.model} (${c.type})</div>`
+    ).join('');
+    
+    // Update summary information
+    document.getElementById('totalDevices').textContent = totalDevices;
+    document.getElementById('recommendedSNE').textContent = sneModel;
+    document.getElementById('recommendedPanel').textContent = 
+        `${panelCount}x ${panelSize.size} NEMA 1 panels`;
+}
+
+// Debug logging
+window.debugJCI = {
+    logSystem(system) {
+        console.log('System Configuration:', {
+            type: system.type,
+            complexity: system.complexity,
+            quantity: system.quantity,
+            points: systemTypes[system.type][system.complexity].points
+        });
+    },
+    
+    logControllers(controllers) {
+        console.log('Controller Configuration:', controllers.map(c => ({
+            model: c.model,
+            quantity: c.quantity,
+            type: c.type
+        })));
+    },
+    
+    logPoints(points) {
+        console.log('Point Totals:', points);
+    }
+};
