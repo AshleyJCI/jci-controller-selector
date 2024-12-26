@@ -45,21 +45,17 @@ input[type="number"] {
     border-radius: 6px;
 }
 
-.hidden {
-    display: none;
-}
-
 .results {
     margin: 15px 0;
 }
 
-#pointsList {
+.results ul {
     list-style-type: none;
     padding-left: 20px;
     margin: 10px 0;
 }
 
-#pointsList li {
+.results li {
     margin: 5px 0;
     color: #24292e;
 }
@@ -72,10 +68,6 @@ input[type="number"] {
 #controllerList div {
     margin: 5px 0;
     color: #1a73e8;
-}
-
-.warnings {
-    margin-top: 15px;
 }
 
 .warning {
