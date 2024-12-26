@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JCI Controller Selector</title>
+    <title>JCI Controller Selection Tool</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,11 +19,20 @@
         <div id="recommendation" class="recommendation hidden">
             <h2>Recommendation</h2>
             <div class="results">
-                <p>Total Points: <span id="totalPoints">0</span></p>
+                <p>Total Points Required:</p>
+                <ul id="pointsList">
+                    <li>Universal Inputs (UI): <span id="totalUI">0</span></li>
+                    <li>Binary Inputs (BI): <span id="totalBI">0</span></li>
+                    <li>Binary Outputs (BO): <span id="totalBO">0</span></li>
+                    <li>Configurable Outputs (CO): <span id="totalCO">0</span></li>
+                    <li>Analog Outputs (AO): <span id="totalAO">0</span></li>
+                </ul>
+                <p>Required Controllers:</p>
+                <div id="controllerList"></div>
                 <p>Total Devices: <span id="totalDevices">0</span></p>
-                <p>Required Controllers: <span id="requiredControllers">0</span></p>
                 <p>Recommended SNE: <span id="recommendedSNE">-</span></p>
-                <p>Recommended Panel Size: <span id="recommendedPanel">-</span></p>
+                <p>Panel Requirements: <span id="recommendedPanel">-</span></p>
+                <div id="warnings" class="warnings"></div>
             </div>
         </div>
     </div>
