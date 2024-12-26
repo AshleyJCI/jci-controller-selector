@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCI Controller Selector</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>JCI Controller Selection Tool</h1>
+        
+        <div class="controls">
+            <button id="addSystem" class="btn">Add System</button>
+        </div>
+
+        <div id="systemList"></div>
+
+        <div id="recommendation" class="recommendation hidden">
+            <h2>Recommendation</h2>
+            <div class="results">
+                <p>Total Points: <span id="totalPoints">0</span></p>
+                <p>Total Devices: <span id="totalDevices">0</span></p>
+                <p>Required Controllers: <span id="requiredControllers">0</span></p>
+                <p>Recommended SNE: <span id="recommendedSNE">-</span></p>
+                <p>Recommended Panel Size: <span id="recommendedPanel">-</span></p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
