@@ -1,5 +1,5 @@
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
     font-family: Arial, sans-serif;
@@ -25,12 +25,18 @@
     padding: 15px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    align-items: center;
 }
 
 select, input {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    min-width: 120px;
+}
+
+input[type="number"] {
+    width: 80px;
 }
 
 .recommendation {
@@ -46,4 +52,39 @@ select, input {
 
 .results p {
     margin: 8px 0;
+}
+
+.results ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+.warnings {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 4px;
+}
+
+#controllerList {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: auto;
 }
