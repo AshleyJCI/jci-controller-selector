@@ -19,7 +19,7 @@ const systemTypes = {
     }
 };
 
-// Controller definitions with point capacities
+// Controller definitions
 const controllers = {
     cgm04060: {
         model: 'M4-CGM04060-0',
@@ -45,15 +45,10 @@ const controllers = {
         model: 'M4-XPM09090-0',
         ui: 7, bi: 2, bo: 3, co: 4, ao: 2,
         requiresBase: true
-    },
-    xpm18000: {
-        model: 'M4-XPM18000-0',
-        ui: 0, bi: 18, bo: 0, co: 0, ao: 0,
-        requiresBase: true
     }
 };
 
-// Panel size definitions based on sizing guide
+// Panel size definitions
 const panelSizes = {
     smallest: {
         size: '16x20',
@@ -193,7 +188,6 @@ function determineControllers(points, systems) {
     // Handle other systems
     const nonVAVSystems = systems.filter(s => s.type !== 'vav');
     if (nonVAVSystems.length > 0) {
-        // Calculate points excluding VAV points
         const remainingPoints = {
             ui: points.ui,
             bi: points.bi,
@@ -218,7 +212,7 @@ function determineControllers(points, systems) {
                 type: 'General Purpose Controller'
             });
 
-            // Calculate remaining points after CGM09090s
+            // Check if expansion modules needed
             const remainingAfterCGM = {
                 ui: remainingPoints.ui - (cgm09090Count * controllers.cgm09090.ui),
                 bi: remainingPoints.bi - (cgm09090Count * controllers.cgm09090.bi),
@@ -227,7 +221,6 @@ function determineControllers(points, systems) {
                 ao: remainingPoints.ao - (cgm09090Count * controllers.cgm09090.ao)
             };
 
-            // Add expansion modules if needed
             if (Object.values(remainingAfterCGM).some(v => v > 0)) {
                 const xpmCount = Math.ceil(Math.max(
                     remainingAfterCGM.ui / controllers.xpm09090.ui,
@@ -276,43 +269,4 @@ function calculateRecommendation() {
     const panelSize = determinePanelSize(totalControllers);
     const numberOfPanels = Math.ceil(totalControllers / panelSize.maxControllers);
     
-    // Determine SNE model based on device count
-    const totalDevices = requiredControllers.reduce((sum, c) => sum + c.quantity, 0);
-    let recommendedSNE = 'SNE10500';
-    if (totalDevices > 150) recommendedSNE = 'SNE22000';
-    else if (totalDevices > 60) recommendedSNE = 'SNE11000';
-    
-    // Update UI
-    updateUI(points, requiredControllers, totalDevices, recommendedSNE, panelSize, numberOfPanels, warnings);
-}
-
-function updateUI(points, controllers, totalDevices, sneModel, panelSize, panelCount, warnings) {
-    document.getElementById('recommendation').classList.remove('hidden');
-    
-    // Update points
-    document.getElementById('totalPoints').textContent = `Total Hardware Points: ${points.total}`;
-    document.getElementById('pointBreakdown').innerHTML = `
-        <ul>
-            <li>Universal Inputs (UI): ${points.ui}</li>
-            <li>Binary Inputs (BI): ${points.bi}</li>
-            <li>Binary Outputs (BO): ${points.bo}</li>
-            <li>Configurable Outputs (CO): ${points.co}</li>
-            <li>Analog Outputs (AO): ${points.ao}</li>
-        </ul>
-    `;
-    
-    // Update controllers
-    const controllerList = document.getElementById('controllerList');
-    controllerList.innerHTML = controllers.map(c => 
-        `<div>${c.quantity}x ${c.model} (${c.type})</div>`
-    ).join('');
-    
-    document.getElementById('totalDevices').textContent = totalDevices;
-    document.getElementById('recommendedSNE').textContent = sneModel;
-    document.getElementById('recommendedPanel').textContent = 
-        `${panelCount}x ${panelSize.size} NEMA 1 panels (Max ${panelSize.maxControllers} controllers per panel)`;
-    
-    // Update warnings
-    const warningsDiv = document.getElementById('warnings');
-    warningsDiv.innerHTML = warnings.map(w => `<div class="warning">${w}</div>`).join('');
-}
+    const totalDevices = requiredControllers.reduce((sum, c) => sum + c.quantity
